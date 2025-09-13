@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>进度组件测试</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .step {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .step.pending {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+        }
+        .step.current {
+            background-color: #eff6ff;
+            border: 1px solid #bfdbfe;
+        }
+        .step.completed {
+            background-color: #f0fdf4;
+            border: 1px solid #bbf7d0;
+        }
+        .step.error {
+            background-color: #fef2f2;
+            border: 1px solid #fecaca;
+        }
+        .icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 2px;
+        }
+        .icon.pending {
+            border: 2px solid #d1d5db;
+        }
+        .icon.current {
+            border: 2px solid #3b82f6;
+            background-color: #dbeafe;
+            animation: spin 1s linear infinite;
+        }
+        .icon.completed {
+            background-color: #10b981;
+            color: white;
+        }
+        .icon.error {
+            background-color: #ef4444;
+            color: white;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background-color: #e5e7eb;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: #3b82f6;
+            transition: width 0.3s ease;
+        }
+        .title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .message {
+            font-size: 14px;
+            color: #6b7280;
+        }
+        .step.current .title { color: #1d4ed8; }
+        .step.current .message { color: #2563eb; }
+        .step.completed .title { color: #047857; }
+        .step.completed .message { color: #059669; }
+        .step.error .title { color: #dc2626; }
+        .step.error .message { color: #ef4444; }
+    </style>
+</head>
+<body>
+    <h1>试卷生成进度组件测试</h1>
+    
+    <h2>修复前的问题演示：</h2>
+    <div class="step completed">
+        <div class="icon pending">○</div>
+        <div>
+            <div class="title">生成题目 (100%)</div>
+            <div class="message">已完成题目生成</div>
+        </div>
+    </div>
+    <p style="color: #ef4444;">❌ 问题：步骤已完成但图标仍显示为未开始状态</p>
+
+    <h2>修复后的效果：</h2>
+    
+    <div class="step pending">
+        <div class="icon pending">○</div>
+        <div>
+            <div class="title">初始化 (0%)</div>
+            <div class="message">等待开始...</div>
+        </div>
+    </div>
+
+    <div class="step current">
+        <div class="icon current">⟳</div>
+        <div style="flex: 1;">
+            <div class="title">生成研究主题 (45%)</div>
+            <div class="message">正在分析知识点并生成研究主题...</div>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 45%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="step completed">
+        <div class="icon completed">✓</div>
+        <div>
+            <div class="title">收集知识内容 (100%)</div>
+            <div class="message">已完成知识内容收集</div>
+        </div>
+    </div>
+
+    <div class="step completed">
+        <div class="icon completed">✓</div>
+        <div>
+            <div class="title">生成题目 (100%)</div>
+            <div class="message">已生成15道题目</div>
+        </div>
+    </div>
+
+    <div class="step error">
+        <div class="icon error">✗</div>
+        <div>
+            <div class="title">生成PDF文件 (0%)</div>
+            <div class="message">PDF生成失败：字体文件未找到</div>
+        </div>
+    </div>
+
+    <h2>修复要点：</h2>
+    <ul>
+        <li>✅ <strong>完成状态判断</strong>：progress === 100 && !error 时显示绿色勾选</li>
+        <li>✅ <strong>当前步骤指示</strong>：正在执行的步骤显示蓝色旋转图标</li>
+        <li>✅ <strong>进度可视化</strong>：未完成步骤显示进度条</li>
+        <li>✅ <strong>错误状态</strong>：有错误时显示红色警告图标</li>
+        <li>✅ <strong>视觉层次</strong>：不同状态使用不同的背景色和边框</li>
+    </ul>
+
+    <h2>状态映射：</h2>
+    <table border="1" style="border-collapse: collapse; width: 100%; margin-top: 10px;">
+        <tr style="background-color: #f9fafb;">
+            <th style="padding: 8px;">状态</th>
+            <th style="padding: 8px;">条件</th>
+            <th style="padding: 8px;">图标</th>
+            <th style="padding: 8px;">背景色</th>
+        </tr>
+        <tr>
+            <td style="padding: 8px;">未开始</td>
+            <td style="padding: 8px;">progress === 0</td>
+            <td style="padding: 8px;">灰色圆圈</td>
+            <td style="padding: 8px;">灰色背景</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px;">进行中</td>
+            <td style="padding: 8px;">isCurrent && isGenerating</td>
+            <td style="padding: 8px;">蓝色旋转时钟</td>
+            <td style="padding: 8px;">蓝色背景</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px;">已完成</td>
+            <td style="padding: 8px;">progress === 100 && !error</td>
+            <td style="padding: 8px;">绿色勾选</td>
+            <td style="padding: 8px;">绿色背景</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px;">错误</td>
+            <td style="padding: 8px;">error !== null</td>
+            <td style="padding: 8px;">红色警告</td>
+            <td style="padding: 8px;">红色背景</td>
+        </tr>
+    </table>
+
+    <script>
+        // 模拟进度更新
+        function simulateProgress() {
+            const currentStep = document.querySelector('.step.current');
+            const progressBar = currentStep.querySelector('.progress-fill');
+            const title = currentStep.querySelector('.title');
+            const message = currentStep.querySelector('.message');
+            
+            let progress = 45;
+            const interval = setInterval(() => {
+                progress += 5;
+                progressBar.style.width = progress + '%';
+                title.textContent = `生成研究主题 (${progress}%)`;
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    currentStep.className = 'step completed';
+                    currentStep.querySelector('.icon').className = 'icon completed';
+                    currentStep.querySelector('.icon').textContent = '✓';
+                    title.textContent = '生成研究主题 (100%)';
+                    message.textContent = '已完成研究主题生成';
+                    currentStep.querySelector('.progress-bar').style.display = 'none';
+                }
+            }, 500);
+        }
+        
+        // 3秒后开始模拟
+        setTimeout(simulateProgress, 3000);
+    </script>
+</body>
+</html>

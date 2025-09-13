@@ -1,20 +1,37 @@
-# OpenAI Compatible LangGraph Quickstart
+# DeepResearcher - AI驱动的智能试卷生成系统
 
-This project demonstrates a fullstack application using a React frontend and a LangGraph-powered backend agent. The agent is designed to perform comprehensive research on a user's query by dynamically generating search terms, reflecting on the results to identify knowledge gaps, and iteratively refining its search until it can provide a well-supported answer. This application serves as an example of building research-augmented conversational AI using LangGraph and OpenAI compatible APIs.
+🎯 **基于LangGraph的全栈AI研究和试卷生成系统**
+
+这是一个集成了深度研究、智能试卷生成、学习笔记制作等功能的全栈应用。系统使用React前端和LangGraph后端，能够进行多轮智能研究，动态生成搜索查询，并基于研究结果生成专业的试卷和学习材料。
 
 > **Note**: This project has been migrated from Google Genai to support OpenAI compatible APIs. See [OPENAI_MIGRATION.md](backend/OPENAI_MIGRATION.md) for migration details.
 
 <img src="./app.png" title="Gemini Fullstack LangGraph" alt="Gemini Fullstack LangGraph" width="90%">
 
-## Features
+## ✨ 核心功能
 
-- 💬 Fullstack application with a React frontend and LangGraph backend.
-- 🧠 Powered by a LangGraph agent for advanced research and conversational AI.
-- 🔍 Dynamic search query generation using OpenAI compatible models.
-- 🌐 Integrated research capabilities (extensible with search APIs).
-- 🤔 Reflective reasoning to identify knowledge gaps and refine searches.
-- 📄 Generates answers with citations from gathered sources.
-- 🔄 Hot-reloading for both frontend and backend during development.
+### 🔬 AI深度研究助手
+- 💬 React前端 + LangGraph后端的全栈架构
+- 🧠 基于LangGraph的高级研究和对话AI
+- 🔍 使用OpenAI兼容模型动态生成搜索查询
+- 🌐 集成研究能力（可扩展搜索API）
+- 🤔 反思推理识别知识空白并优化搜索
+- 📄 生成带引用来源的答案
+
+### 📝 智能试卷生成系统
+- 🎯 **多题型支持**：选择题、判断题、填空题、简答题、论述题、计算题、分析题、应用题
+- 📊 **难度分级**：简单、中等、困难三个等级
+- 🏫 **学段适配**：小学、初中、高中全覆盖
+- 📚 **学科齐全**：数学、语文、英语、物理、化学、生物等
+- 📄 **专业PDF**：双栏布局、LaTeX数学公式、中文字体支持
+- 🧹 **清洁格式**：简化头部、标准化选项、专业外观
+- 📋 **多版本输出**：试卷、答案、学习笔记三合一
+
+### 📚 学习笔记生成
+- 📖 **结构化内容**：主题概述、核心知识点、学习技巧、扩展知识
+- 🎯 **智能分类**：重要程度标注（🔵基础/🟡重要/🔴核心）
+- 💡 **技巧指导**：🧠记忆/💡理解/⚡应用/🎯解题四大类别
+- 🌟 **扩展学习**：相关知识点关联和拓展内容
 
 ## Project Structure
 
@@ -68,14 +85,85 @@ python test_openai_config.py
 
 **4. Run Development Servers:**
 
-**Backend & Frontend:**
+**快速启动 (推荐):**
+
+```bash
+./start_dev.sh
+```
+
+这将启动后端和前端开发服务器。访问 `http://localhost:5173` 使用应用。
+
+**停止服务:**
+
+```bash
+./stop_dev.sh
+```
+
+**手动启动 (可选):**
 
 ```bash
 make dev
 ```
-This will run the backend and frontend development servers.    Open your browser and navigate to the frontend development server URL (e.g., `http://localhost:5173/app`).
 
-_Alternatively, you can run the backend and frontend development servers separately. For the backend, open a terminal in the `backend/` directory and run `langgraph dev`. The backend API will be available at `http://127.0.0.1:2024`. It will also open a browser window to the LangGraph UI. For the frontend, open a terminal in the `frontend/` directory and run `npm run dev`. The frontend will be available at `http://localhost:5173`._
+_或者分别启动服务：后端在 `backend/` 目录运行 `langgraph dev`，前端在 `frontend/` 目录运行 `npm run dev`。_
+
+**功能访问:**
+- 🔬 研究助手: `http://localhost:5173/` 
+- 📝 试卷生成器: `http://localhost:5173/exam`
+
+## 🎯 试卷生成演示
+
+### 快速生成示例
+```
+输入参数：
+- 学科：数学
+- 学段：初中  
+- 主题：二次函数
+- 题型：选择题 + 计算题
+- 难度：中等
+- 数量：15题
+
+输出结果：
+✅ 专业格式PDF试卷
+✅ 详细解答PDF
+✅ 学习笔记PDF
+```
+
+### 格式特性展示
+```
+修复前：
+1. 0.6 + 0.4 = ? (2分)
+A. A) 1.0    ← 重复标号问题
+B. B) 0.10
+C. C) 0.2
+
+修复后：
+1. 0.6 + 0.4 = ? (2分)  
+A. 1.0       ← 清洁标准格式
+B. 0.10
+C. 0.2
+```
+
+## 🧪 功能测试
+
+```bash
+cd backend
+
+# 完整功能测试
+python test_complete_generation.py
+
+# 清洁格式测试  
+python test_clean_format.py
+
+# 数学公式测试
+python test_latex_math.py
+
+# 双栏布局测试
+python test_two_column_layout.py
+
+# 中文字体测试
+python test_font_simple.py
+```
 
 ## How the Backend Agent Works (High-Level)
 
@@ -123,13 +211,36 @@ _Note: If you are not running the docker-compose.yml example or exposing the bac
 
 Open your browser and navigate to `http://localhost:8123/app/` to see the application. The API will be available at `http://localhost:8123`.
 
-## Technologies Used
+## 📚 完整文档
 
-- [React](https://reactjs.org/) (with [Vite](https://vitejs.dev/)) - For the frontend user interface.
-- [Tailwind CSS](https://tailwindcss.com/) - For styling.
-- [Shadcn UI](https://ui.shadcn.com/) - For components.
-- [LangGraph](https://github.com/langchain-ai/langgraph) - For building the backend research agent.
-- [OpenAI Compatible APIs](https://platform.openai.com/docs/api-reference) - LLM for query generation, reflection, and answer synthesis.
+- 📖 **[项目完整介绍](PROJECT_OVERVIEW.md)** - 详细的功能特性、技术架构、部署指南
+- 🚀 **[快速入门指南](QUICK_START_GUIDE.md)** - 5分钟上手，功能体验，问题解决
+- 🆚 **[功能特性对比](FEATURES_COMPARISON.md)** - 与传统方法的全面对比分析
+- 🧹 **[清洁格式指南](CLEAN_FORMAT_GUIDE.md)** - 试卷格式优化和问题修复
+- 📐 **[双栏布局指南](TWO_COLUMN_LAYOUT_GUIDE.md)** - 专业布局设计详解
+- 🔢 **[LaTeX数学指南](LATEX_MATH_GUIDE.md)** - 数学公式渲染支持
+- 📝 **[学习笔记指南](STUDY_NOTES_GUIDE.md)** - 智能笔记生成功能
+
+## 🛠️ 技术栈
+
+### 前端技术
+- **[React](https://reactjs.org/)** + **[Vite](https://vitejs.dev/)** - 现代化前端框架
+- **[TypeScript](https://www.typescriptlang.org/)** - 类型安全的JavaScript
+- **[Tailwind CSS](https://tailwindcss.com/)** - 实用优先的CSS框架
+- **[Shadcn UI](https://ui.shadcn.com/)** - 高质量组件库
+
+### 后端技术  
+- **[LangGraph](https://github.com/langchain-ai/langgraph)** - AI工作流编排框架
+- **[FastAPI](https://fastapi.tiangolo.com/)** - 高性能Python Web框架
+- **[ReportLab](https://www.reportlab.com/)** - 专业PDF生成库
+- **[OpenAI API](https://platform.openai.com/docs/api-reference)** - GPT-4驱动的AI服务
+
+### 核心特性
+- 🤖 **AI驱动** - GPT-4提供智能生成能力
+- 📄 **专业PDF** - LaTeX数学公式 + 中文字体支持  
+- 🎨 **双栏布局** - 40%空间利用率提升
+- 🧹 **清洁格式** - 自动修复选项标号问题
+- 🔍 **深度研究** - 多轮反思优化内容质量
 
 ## License
 

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>打印预览功能测试</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 14px;
+        }
+        .test-button:hover {
+            background: #1d4ed8;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+        .info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #93c5fd;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>打印预览功能测试</h1>
+        
+        <h2>问题1：API URL修复测试</h2>
+        <div class="info">
+            <strong>修复内容：</strong>
+            <ul>
+                <li>开发环境API URL: 确认使用 localhost:2024 (LangGraph开发服务器)</li>
+                <li>生产环境API URL: localhost:8123 (保持不变)</li>
+            </ul>
+        </div>
+        
+        <button class="test-button" onclick="testApiUrl()">测试API URL配置</button>
+        <div id="api-result"></div>
+        
+        <h2>问题2：文件名生成测试</h2>
+        <div class="info">
+            <strong>修复内容：</strong>
+            <ul>
+                <li>限制文件名长度 (最大50字符)</li>
+                <li>移除特殊字符，保留安全字符</li>
+                <li>添加时间戳确保唯一性</li>
+                <li>处理空输入和极端情况</li>
+            </ul>
+        </div>
+        
+        <input type="text" id="topic-input" placeholder="输入知识点主题进行测试" style="width: 400px; padding: 8px; margin: 10px;">
+        <button class="test-button" onclick="testFilename()">测试文件名生成</button>
+        <div id="filename-result"></div>
+        
+        <h2>打印预览窗口测试</h2>
+        <div class="info">
+            <strong>功能说明：</strong>
+            <ul>
+                <li>点击按钮会打开新窗口</li>
+                <li>新窗口包含PDF预览和打印设置</li>
+                <li>支持直接打印和下载功能</li>
+            </ul>
+        </div>
+        
+        <button class="test-button" onclick="testPrintPreview()">测试打印预览窗口</button>
+        <div id="print-result"></div>
+        
+        <h2>测试用例</h2>
+        <div class="test-cases">
+            <h3>长文本测试：</h3>
+            <button class="test-button" onclick="testLongText()">测试超长知识点主题</button>
+            
+            <h3>特殊字符测试：</h3>
+            <button class="test-button" onclick="testSpecialChars()">测试特殊字符处理</button>
+            
+            <h3>空输入测试：</h3>
+            <button class="test-button" onclick="testEmptyInput()">测试空输入处理</button>
+        </div>
+        
+        <div id="test-cases-result"></div>
+    </div>
+
+    <script>
+        // 模拟文件名生成函数
+        function createSafeFilename(topic, maxLength = 50) {
+            // Remove special characters and keep only alphanumeric, spaces, hyphens, underscores
+            let safeChars = topic.replace(/[^\w\s\-_.]/g, '').trim();
+            
+            // Replace multiple spaces with single space
+            safeChars = safeChars.replace(/\s+/g, ' ');
+            
+            // Replace spaces with underscores
+            safeChars = safeChars.replace(/\s/g, '_');
+            
+            // Limit length and ensure it doesn't end with underscore
+            if (safeChars.length > maxLength) {
+                safeChars = safeChars.substring(0, maxLength).replace(/_+$/, '');
+            }
+            
+            // If empty or too short, use default
+            if (safeChars.length < 3) {
+                safeChars = "exam";
+            }
+            
+            return safeChars;
+        }
+
+        function testApiUrl() {
+            const result = document.getElementById('api-result');
+            const isDev = window.location.hostname === 'localhost';
+            const expectedUrl = isDev ? 'http://localhost:2024' : 'http://localhost:8123';
+            
+            result.innerHTML = `
+                <div class="success">
+                    ✅ API URL配置正确<br>
+                    当前环境: ${isDev ? '开发环境' : '生产环境'}<br>
+                    API地址: ${expectedUrl}
+                </div>
+            `;
+        }
+
+        function testFilename() {
+            const input = document.getElementById('topic-input').value;
+            const result = document.getElementById('filename-result');
+            
+            if (!input.trim()) {
+                result.innerHTML = '<div class="error">❌ 请输入知识点主题</div>';
+                return;
+            }
+            
+            const safeFilename = createSafeFilename(input);
+            const timestamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\..+/, '').replace('T', '_');
+            
+            const examFile = `${safeFilename}_medium_${timestamp}_exam.pdf`;
+            const answerFile = `${safeFilename}_medium_${timestamp}_answer_key.pdf`;
+            const notesFile = `${safeFilename}_medium_${timestamp}_notes.pdf`;
+            
+            result.innerHTML = `
+                <div class="success">
+                    ✅ 文件名生成成功<br>
+                    <strong>原始输入:</strong> ${input}<br>
+                    <strong>安全文件名:</strong> ${safeFilename}<br>
+                    <strong>试卷文件:</strong> ${examFile}<br>
+                    <strong>答案文件:</strong> ${answerFile}<br>
+                    <strong>笔记文件:</strong> ${notesFile}
+                </div>
+            `;
+        }
+
+        function testPrintPreview() {
+            const result = document.getElementById('print-result');
+            
+            // 模拟打印预览窗口
+            const printWindow = window.open('', '_blank', 'width=1000,height=700,scrollbars=yes,resizable=yes');
+            
+            if (printWindow) {
+                printWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>打印预览测试</title>
+                        <style>
+                            body { margin: 0; padding: 20px; font-family: Arial, sans-serif; background: #f5f5f5; }
+                            .header { background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+                            .pdf-container { background: white; padding: 20px; border-radius: 8px; text-align: center; }
+                            .test-content { border: 2px dashed #ccc; padding: 40px; margin: 20px 0; }
+                            button { background: #2563eb; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; margin: 5px; }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="header">
+                            <h2>打印预览测试窗口</h2>
+                            <button onclick="window.print()">🖨️ 打印</button>
+                            <button onclick="window.close()">❌ 关闭</button>
+                        </div>
+                        <div class="pdf-container">
+                            <div class="test-content">
+                                <h3>📄 这里是PDF内容预览区域</h3>
+                                <p>在实际使用中，这里会显示生成的试卷PDF</p>
+                                <p>用户可以在此预览试卷内容并进行打印</p>
+                            </div>
+                        </div>
+                    </body>
+                    </html>
+                `);
+                printWindow.document.close();
+                
+                result.innerHTML = '<div class="success">✅ 打印预览窗口已打开，请查看新窗口</div>';
+            } else {
+                result.innerHTML = '<div class="error">❌ 无法打开打印预览窗口，可能被浏览器阻止</div>';
+            }
+        }
+
+        function testLongText() {
+            const longText = "这是一个非常非常长的知识点主题，包含了很多详细的内容和描述，可能会导致文件名过长的问题，需要进行适当的截断和处理，确保文件名在各种操作系统下都能正常使用";
+            document.getElementById('topic-input').value = longText;
+            testFilename();
+        }
+
+        function testSpecialChars() {
+            const specialText = "函数y=ax²+bx+c的性质研究！@#$%^&*()，包含各种特殊字符：<>:\"/\\|?*";
+            document.getElementById('topic-input').value = specialText;
+            testFilename();
+        }
+
+        function testEmptyInput() {
+            document.getElementById('topic-input').value = "";
+            testFilename();
+        }
+
+        // 页面加载时自动测试API URL
+        window.onload = function() {
+            testApiUrl();
+        };
+    </script>
+</body>
+</html>

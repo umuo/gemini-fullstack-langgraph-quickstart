@@ -6,13 +6,14 @@ import tailwindcss from "@tailwindcss/vite";
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  base: "/app/",
+  base: "/",  // 修复路由问题：改为根路径
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
   },
   server: {
+    historyApiFallback: true,  // 添加SPA路由支持
     proxy: {
       // Proxy API requests to the backend server
       "/api": {

@@ -5,6 +5,10 @@ frontend/.vite/
 frontend/coverage/
 .DS_Store
 *.local
+generated_exams
+doc
+tests
+test_output
 
 # Logs
 logs

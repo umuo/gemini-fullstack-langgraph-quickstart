@@ -18,6 +18,10 @@ dependencies = [
     "langgraph-api",
     "fastapi",
     "openai",
+    "reportlab>=4.0.0",
+    "pillow>=10.0.0",
+    "matplotlib>=3.5.0",
+    "sympy>=1.12",
 ]
 
 
