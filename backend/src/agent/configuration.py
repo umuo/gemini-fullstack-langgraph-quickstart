@@ -8,22 +8,33 @@ from langchain_core.runnables import RunnableConfig
 class Configuration(BaseModel):
     """The configuration for the agent."""
 
+    # OpenAI Compatible API Configuration
+    openai_api_key: str = Field(
+        default_factory=lambda: os.getenv("OPENAI_API_KEY", ""),
+        metadata={"description": "The API key for OpenAI compatible service."},
+    )
+
+    openai_base_url: str = Field(
+        default_factory=lambda: os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1"),
+        metadata={"description": "The base URL for OpenAI compatible API."},
+    )
+
     query_generator_model: str = Field(
-        default="gemini-2.0-flash",
+        default_factory=lambda: os.getenv("OPENAI_MODEL", "gpt-4o"),
         metadata={
             "description": "The name of the language model to use for the agent's query generation."
         },
     )
 
     reflection_model: str = Field(
-        default="gemini-2.5-flash",
+        default_factory=lambda: os.getenv("OPENAI_MODEL", "gpt-4o"),
         metadata={
             "description": "The name of the language model to use for the agent's reflection."
         },
     )
 
     answer_model: str = Field(
-        default="gemini-2.5-pro",
+        default_factory=lambda: os.getenv("OPENAI_MODEL", "gpt-4o"),
         metadata={
             "description": "The name of the language model to use for the agent's answer."
         },
